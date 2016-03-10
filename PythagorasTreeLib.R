@@ -2,24 +2,33 @@
 
 rotationMatrix2D = function(rad) matrix(c(cos(rad),-sin(rad),sin(rad),cos(rad)),2,2)
 
-generatePythagorasTree <- function(maxLevel = 10, ratio = 0.5){
-  
-  generateTreeRec <- function(level, anchor, angle, baseLen, side){
-    baseCube = matrix(c(0,0,1,1,0,1,1,0), 4, 2) * baseLen
+generatePythagorasTree <- function(maxLevel = 10, p = 0.5, random_p = FALSE){
+  generateTreeRec <- function(level, anchor, angle, base, side){
+    baseCube = matrix(c(0,0,1,1,0,1,1,0), 4, 2) * base
     R = rotationMatrix2D(angle)
-
+    
     newCube = t((R %*% t(baseCube)) + anchor)
     
     if(level == maxLevel){
       return(as.vector(newCube))
     }else{
+      if(random_p) p = runif(1)
+      angle_left = asin(sqrt(1-p))
+      angle_right = asin(sqrt(p))
+      base_left = base*sqrt(p)
+      base_right = base*sqrt(1-p)
+      
       return( rbind(as.vector(newCube), 
-                    generateTreeRec(level + 1, newCube[2 + side,], angle + (-1 + 2*side) * pi/4, baseLen/sqrt(2), 0),
-                    generateTreeRec(level + 1, newCube[3 + side,], angle + (-1 + 2*side) * pi/4, baseLen/sqrt(2), 1)))
+                    generateTreeRec(level + 1, newCube[2 + side,], 
+                                    angle + ifelse(side==0, -angle_left, pi/2 - angle_left), 
+                                    base_left, 0),
+                    generateTreeRec(level + 1, newCube[3 + side,], 
+                                    angle + ifelse(side==0, -pi/2 + angle_right, angle_right), 
+                                    base_right, 1)))
     } 
   }
   
-  return(generateTreeRec(level=0, anchor=c(0,0), angle=0, baseLen=1, side=0))
+  return(generateTreeRec(level=0, anchor=c(0,0), angle=0, base=1, side=0))
 }
 
 plotTree = function(tree){
@@ -29,11 +38,7 @@ plotTree = function(tree){
   }
 }
 
-
-
-
-tree = generatePythagorasTree(3)
+tree = generatePythagorasTree(13, p=0.5, random_p = T)
 plotTree(tree)
-
 
 
