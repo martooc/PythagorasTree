@@ -12,7 +12,7 @@ generatePythagorasTree <- function(maxLevel = 10, p = 0.5, random_p = FALSE){
     if(level == maxLevel){
       return(as.vector(newCube))
     }else{
-      if(random_p) p = runif(1)
+      if(random_p) p = rnorm(1,0.5,0.25) %% 1 #Little more peaked at 0.5. Truncated betwwen (0,1)
       angle_left = asin(sqrt(1-p))
       angle_right = asin(sqrt(p))
       base_left = base*sqrt(p)
@@ -23,7 +23,7 @@ generatePythagorasTree <- function(maxLevel = 10, p = 0.5, random_p = FALSE){
                                     angle + ifelse(side==0, -angle_left, pi/2 - angle_left), 
                                     base_left, 0),
                     generateTreeRec(level + 1, newCube[3 + side,], 
-                                    angle + ifelse(side==0, -pi/2 + angle_right, angle_right), 
+                                    angle + ifelse(side==0, -(pi/2 - angle_right), angle_right), 
                                     base_right, 1)))
     } 
   }
@@ -38,7 +38,7 @@ plotTree = function(tree){
   }
 }
 
-tree = generatePythagorasTree(13, p=0.5, random_p = T)
+tree = generatePythagorasTree(14, random_p=T)
 plotTree(tree)
 
 
