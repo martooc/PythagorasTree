@@ -15,7 +15,7 @@ rotationMatrix2D <- function(rad){
 } 
 
 
-generatePythagorasTree <- function(maxLevel = 10, p = 0.5, random_p = FALSE, k=100){
+generatePythagorasTree <- function(maxLevel=10, p=0.5, random_p=FALSE, k=100){
   # Generates a Pythagoras tree
   #
   # Args:
@@ -32,24 +32,26 @@ generatePythagorasTree <- function(maxLevel = 10, p = 0.5, random_p = FALSE, k=1
   generateTreeRec <- function(level, anchor, angle, base, side, p){
     # Nested recursive function that computes the coordinates for each cube
     
-    baseCube = matrix(c(0,0,1,1,0,1,1,0), 4, 2) * base
-    R = rotationMatrix2D(angle)
+    baseCube <- matrix(c(0,0,1,1,0,1,1,0), 4, 2) * base
+    R <- rotationMatrix2D(angle)
     
-    newCube = t((R %*% t(baseCube)) + anchor)
+    newCube <- t((R %*% t(baseCube)) + anchor)
     
     if(level == maxLevel){
       return(c(as.vector(newCube), level))
       
     }else{
       # Generate random branching ratio. Biased towards the value that was used in last iteration
-      if(random_p) p = rbeta(1, k * p, k * (1-p)) %% 1
+      if(random_p) p <- rbeta(1, k * p, k * (1-p)) %% 1
       
       #Parameters For the next branch
-      angle_left = asin(sqrt(1-p))
-      angle_right = asin(sqrt(p))
-      base_left = base*sqrt(p)
-      base_right = base*sqrt(1-p)
+      angle_left <- asin(sqrt(1-p))
+      angle_right <- asin(sqrt(p))
+      base_left <- base*sqrt(p)
+      base_right <- base*sqrt(1-p)
       
+      #Generate new branch by calling the same function twice recursively:
+      #once for left branch and once for right branch, with parameters adjusted accordingly
       return( rbind(c(as.vector(newCube), level), 
                     generateTreeRec(level + 1, newCube[2 + side,], 
                                     angle + ifelse(side==0, -angle_left, pi/2 - angle_left), 
@@ -64,7 +66,7 @@ generatePythagorasTree <- function(maxLevel = 10, p = 0.5, random_p = FALSE, k=1
 }
 
 
-plotTree = function(tree, col1, col2, alpha){
+plotTree <- function(tree, col1, col2, alpha){
   # Plots the tree returned from generatePytahgorasTree
   #
   # Args:
@@ -74,13 +76,13 @@ plotTree = function(tree, col1, col2, alpha){
   #   alpha: alpha value of col1 and col2
   
   # Set the margins to 0
-  p = par(mar = c(0,0,0,0))
+  p <- par(mar = c(0,0,0,0))
   
   # Create a color palette
-  gr = paste(colorRampPalette(c(col1, col2))(max(tree[,9] + 1)), alpha, sep = "")
+  gr <- paste0(colorRampPalette(c(col1, col2))(max(tree[,9] + 1)), toupper(alpha))
   
   # Set up an empty plot
-  plot(1, 1, type="n", xlim = range(tree[,1:4]), ylim = range(tree[,5:8]), asp=1)
+  plot(1, 1, type="n", xlim=range(tree[,1:4]), ylim=range(tree[,5:8]), asp=1)
   
   # One by one draw in the cubes
   for (i in 1:nrow(tree)){
@@ -92,11 +94,11 @@ plotTree = function(tree, col1, col2, alpha){
 }
 
 # Generate a random tree with depth 10 and not too much variability (k=100)
-tree = generatePythagorasTree(10, random_p=T, k = 100)
+tree <- generatePythagorasTree(10, random_p=T, k=100)
 
-col1 = "#8B4513"
-col2 = "#00aa00"
-alpha = "bb"
+col1 <- "#8B4513"
+col2 <- "#00aa00"
+alpha <- "bb"
 plotTree(tree, col1, col2, alpha)
 
 
